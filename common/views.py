@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .models import ClockInClockOut,Break
 from django.http import HttpResponse
-from datetime import datetime, date,timedelta
+from datetime import timedelta
 from django.utils import timezone
 import datetime
 
@@ -11,55 +11,58 @@ import datetime
  
     
     
-
-def can_clock_in(email):
-    today = date.today()
-    clock_ins_today = ClockInClockOut.objects.filter(email=email, clock_type='in', timestamp__date=today)
-    return not clock_ins_today.exists()
-
-def can_clock_out(email):
-    today = date.today()
-    clock_outs_today = ClockInClockOut.objects.filter(email=email, clock_type='out', timestamp__date=today)
-    return not clock_outs_today.exists()
-
-
-
-
-
-def index(request):
-    msg=''
-    if request.method == 'POST':
-        email = request.POST['email']
-        action = request.POST['action']
-
-        # Record timestamps based on the action clicked
-        if action == 'clock_in':
-            # Record clock in timestamp for the given email
-            ClockInClockOut.objects.create(timestamp=datetime.datetime.now(), clock_type='in', email=email)
-            
-        elif action == 'clock_out':
-            # Record clock out timestamp for the given email
-            ClockInClockOut.objects.create(timestamp=datetime.datetime.now(), clock_type='out', email=email)
-        elif action == 'start_break':
-            # Record break start timestamp for the given email
-            Break.objects.create(timestamp_start=datetime.datetime.now(), timestamp_end=None, email=email)
-        elif action == 'end_break':
-            # Record break end timestamp for the given email
-            Break.objects.create(timestamp_end=datetime.datetime.now(), timestamp_start=None, email=email)
-
-        return HttpResponse("Action recorded successfully.")
-    else:
-        msg="Error"
-    return render(request,'common/index.html')
-
-
  
 
 
 
-def worktime(request):
-    
+from datetime import datetime, date
+
+
+def index(request):
+    msg = ''
+    if request.method == 'POST':
+        email = request.POST['email']
+        action = request.POST['action']
+        current_datetime = datetime.now()
+        current_date = date.today()
+
+        # Check if there are existing entries for clock in or clock out for the given email on the current day
+        existing_clock_in = ClockInClockOut.objects.filter(email=email, clock_type='in', timestamp__date=current_date).exists()
+        existing_clock_out = ClockInClockOut.objects.filter(email=email, clock_type='out', timestamp__date=current_date).exists()
+
+        if action == 'clock_in' and not existing_clock_in:
+            # Record clock in timestamp for the given email
+            ClockInClockOut.objects.create(timestamp=current_datetime, clock_type='in', email=email)
+             
+            msg='Clock in recorded successfully.'
+        elif action == 'clock_out' and not existing_clock_out and existing_clock_in:
+            # Record clock out timestamp for the given email only if a clock in exists for the same day
+            ClockInClockOut.objects.create(timestamp=current_datetime, clock_type='out', email=email)
+            
+            msg = 'Clock out recorded successfully.'
+        elif action == 'start_break':
+            # Record break start timestamp for the given email
+            Break.objects.create(timestamp_start=current_datetime, timestamp_end=None, email=email)
+             
+            msg = 'Break started.'
+
+        elif action == 'end_break':
+            # Record break end timestamp for the given email
+            Break.objects.create(timestamp_end=current_datetime, timestamp_start=None, email=email)
+             
+            msg='Break Ended'
+        else:
+            msg='Action Already Performed !'
+    else:
+        msg = ""
+    return render(request, 'common/index.html' ,{'message':msg})
+
+
+ 
+
 # Calculate total work time for each employee
+
+def worktime(request):
     employees = ClockInClockOut.objects.values('email').distinct()
     worktime_data = []
 
@@ -77,16 +80,25 @@ def worktime(request):
             # Calculate break time between clock-in and clock-out
             break_time = timedelta()
             for b in breaks:
-                if b.timestamp_start and clock_in.timestamp <= b.timestamp_start and (clock_out is None or b.timestamp_start < clock_out.timestamp):
-                    break_end = b.timestamp_end if b.timestamp_end and (clock_out is None or b.timestamp_end < clock_out.timestamp) else clock_out.timestamp
-                    break_time += min(break_end, clock_out.timestamp) - max(b.timestamp_start, clock_in.timestamp)
+                if (
+                    b.timestamp_start
+                    and clock_in.timestamp <= b.timestamp_start
+                    and (clock_out is None or (b.timestamp_end and b.timestamp_end < clock_out.timestamp))
+                ):
+                    break_end = (
+                        b.timestamp_end
+                        if b.timestamp_end and (clock_out is None or b.timestamp_end < clock_out.timestamp)
+                        else (clock_out.timestamp if clock_out else None)
+                    )
+                    if break_end:
+                        break_time += min(break_end, clock_out.timestamp) - max(b.timestamp_start, clock_in.timestamp)
 
             # Calculate work time after deducting break time
-            work_time = (clock_out.timestamp - clock_in.timestamp - break_time) if clock_out else timedelta()
+            work_time = (clock_out.timestamp - clock_in.timestamp - break_time) if (clock_out and clock_out.timestamp) else timedelta()
 
             worktime_entries.append({
                 'clock_in_time': clock_in.timestamp.time(),
-                'clock_out_time': clock_out.timestamp.time() if clock_out else None,
+                'clock_out_time': clock_out.timestamp.time() if clock_out and clock_out.timestamp else None,
                 'total_work_time': work_time
             })
 
@@ -97,5 +109,7 @@ def worktime(request):
         })
 
     return render(request, 'common/worktime.html', {'worktime_data': worktime_data})
+
+
 
   

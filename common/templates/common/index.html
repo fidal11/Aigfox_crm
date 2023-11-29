@@ -11,50 +11,70 @@
 </head>
 
 <body>
-    <!-- <section class="header-section">
-        <header class="header">
-            <div class="logo">
-                <img src="images/njr.png" alt="" width="80px">
+    
+
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="#">
+                <img src="{% static 'image/aigfox-logo.png' %}" alt="" width="45px">
+              </a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                  </li>
+                 
+                </ul>
+                 
+              </div>
+              <div>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'common:worktime' %}">Worktime</a>
+                  </li> 
+                  </ul>
+              </div>
             </div>
-            <nav class="navbar">
-                <a href="#">Home</a>
-                <a href="#">About</a>
-                <a href="#">Career</a>
-                <a href="#">Gallery</a>
-            </nav>
-        </header>
-        </section> -->
+          </nav>
+
     
     <section class="heading">
         <h1>Attendence</h1>
 
-        <h4>Aigfox Technologies</h4>
+        <!-- <h4>Aigfox Technologies</h4> -->
     </section>
 
-    <section class="link"><a href="{% url 'common:worktime' %}">Worktime</a></section>
+    <!-- <section class="link"><a href="{% url 'common:worktime' %}">Worktime</a></section> -->
+    
+
     
 
     <section class="main">
-
+<div class="container-fluid" style="width: 100%; text-align: center;">{{message}}</div>
 
         <form method="POST">
             {% csrf_token %}
             <div class="form">
+                 
                 <div class="elements">
                     <label for="email">Email:</label> <input type="text" name="email" required>
                 </div>
                 <div class="buttons">
                     <div class="d-grid gap-2 col-6 mx-auto button1">
-                        <button type="submit" class="btn btn-outline-success" name="action" value="clock_in">Clock
+                        <button type="submit" class="btn btn-success" name="action" value="clock_in">Clock
                             in</button>
-                        <button type="submit" class="btn btn-outline-warning" name="action" value="start_break">Break
+                        <button type="submit" class="btn btn-warning" name="action" value="start_break">Break
                             Out</button>
                     </div>
 
                     <div class="d-grid gap-2 col-6 mx-auto button2">
-                        <button type="submit" class="btn btn-outline-danger" name="action" value="clock_out">Clock
+                        <button type="submit" class="btn btn-danger" name="action" value="clock_out">Clock
                             out</button>
-                        <button type="submit" class="btn btn-outline-success" name="action" value="end_break">Break
+                        <button type="submit" class="btn btn-success" name="action" value="end_break">Break
                             In</button>
                     </div>
                 </div>

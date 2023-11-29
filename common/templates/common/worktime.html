@@ -15,40 +15,56 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-  <!-- {% for data in worktime_data %}
-  <h3>Email: {{ data.email }}</h3>
-  <p>Date: {{ data.date }}</p>
-  <ul>
-      {% for entry in data.worktime_entries %}
-          <li>
-               
-              <h4>Total Work Time: {{ entry.total_work_time }}</h4>
-          </li>
-      {% endfor %}
-  </ul>
-  <hr>
-{% endfor %} -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">
+            <img src="{% static 'image/aigfox-logo.png' %}" alt="" width="45px">
+
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="{% url 'common:index' %}">Home</a>
+              </li>
+             
+            </ul>
+             
+          </div>
+          <div>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'common:worktime' %}">Worktime</a>
+              </li> 
+              </ul>
+          </div>
+        </div>
+      </nav>
+   
 
 
-<div class="table container-fluid">
-    <table style="width: 100%; border-collapse: collapse;">
-        <tr>
-            <th>Date</th>
-            <th>Email</th>
-            <th>Total Worktime</th>
-
-        </tr>
-        {% for data in worktime_data %}
-        <tr>
-            <td>{{data.date}}</td>
-            <td>{{data.email}}</td>
-            {% for entry in data.worktime_entries %}
-            <td>{{entry.total_work_time}}</td>
+      <div class="table container-fluid">
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <th>Date</th>
+                <th>Email</th>
+                <th>Total Worktime</th>
+    
+            </tr>
+            {% for data in worktime_data %}
+            <tr>
+                <td>{{data.date}}</td>
+                <td>{{data.email}}</td>
+                {% for entry in data.worktime_entries %}
+                <td>{{entry.total_work_time}}</td>
+                {% endfor %}
+            </tr>
             {% endfor %}
-        </tr>
-        {% endfor %}
-    </table>
-</div>
+        </table>
+    </div>
 
  
 </body>
