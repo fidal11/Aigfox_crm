@@ -18,7 +18,7 @@
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
           <a class="navbar-brand" href="#">
-            <img src="{% static 'image/aigfox-logo.png' %}" alt="" width="45px">
+            <img src="{% static 'image/aigfox-logo.png' %}" alt="" width="35px">
 
           </a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,28 +44,73 @@
         </div>
       </nav>
    
+<!-- <div class="container-fluid">
+  <form id="filterForm">
+    <label for="filter_date">Filter by Date:</label>
+    <input type="date" id="filter_date" name="filter_date">
+    <button type="submit">Filter</button>
+</form> -->
+
+ 
+</div>
+
+<div class="table container-fluid">
+  <table style="width: 100%; border-collapse: collapse;">
+      <tr>
+          <th><a href="#" class="sort" data-sort="date">Date</a></th>
+          <th><a href="#" class="sort" data-sort="email">Email</th>
+          <th>Total Worktime</a></th>
+      </tr>
+      {% for data in worktime_data %}
+          {% for entry in data.worktime_entries %}
+              <tr>
+                  <td>{{ entry.date }}</td>
+                  <td>{{ data.email }}</td>
+                  <td>{{ entry.total_work_time }}</td>
+              </tr>
+          {% endfor %}
+      {% endfor %}
+  </table>
+</div>
 
 
-      <div class="table container-fluid">
-        <table style="width: 100%; border-collapse: collapse;">
-            <tr>
-                <th>Date</th>
-                <th>Email</th>
-                <th>Total Worktime</th>
-    
-            </tr>
-            {% for data in worktime_data %}
-            <tr>
-                <td>{{data.date}}</td>
-                <td>{{data.email}}</td>
-                {% for entry in data.worktime_entries %}
-                <td>{{entry.total_work_time}}</td>
-                {% endfor %}
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
 
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      const table = document.querySelector("table");
+      const tbody = table.querySelector("tbody");
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+      const headers = table.querySelectorAll("th");
+
+      headers.forEach(header => {
+          header.addEventListener("click", () => {
+              const index = Array.from(header.parentNode.children).indexOf(header);
+              const isDate = header.textContent === "Date";
+              const isEmail = header.textContent === "Email";
+              const isTime = header.textContent === "Total Worktime";
+
+              rows.sort((a, b) => {
+                  const aValue = a.children[index].textContent.trim();
+                  const bValue = b.children[index].textContent.trim();
+
+                  if (isDate || isTime) {
+                      return new Date(aValue) - new Date(bValue);
+                  } else if (isEmail) {
+                      return aValue.localeCompare(bValue);
+                  }
+              });
+
+              while (tbody.firstChild) {
+                  tbody.removeChild(tbody.firstChild);
+              }
+
+              rows.forEach(row => {
+                  tbody.appendChild(row);
+              });
+          });
+      });
+  });
+</script>
  
 </body>
 </html>

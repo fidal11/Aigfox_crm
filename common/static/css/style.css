@@ -68,11 +68,9 @@ a{
 }
 
 h1{
-    font-family: 'Poppins', sans-serif;
+  font-family: 'Kanit', sans-serif
 }
-h4{
-    font-family: 'Kanit', sans-serif
-}
+ 
 input[type=text] {
 	margin: 10px;
 	padding: 10px;
